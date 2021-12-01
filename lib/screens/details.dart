@@ -22,7 +22,9 @@ class Details extends StatelessWidget {
               final count = await DrugDb.instance.update(
                 Drug(
                   id: d!.id,
-                  name: _drugName ?? d!.name,
+                  name: (_drugName != null && _drugName != "")
+                      ? _drugName!
+                      : d!.name,
                   description: _drugDescription ?? d!.description,
                   parentId: d!.parentId,
                   categoryId: d!.categoryId,

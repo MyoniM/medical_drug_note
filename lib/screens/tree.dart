@@ -381,7 +381,7 @@ void _showUpdate(context, DrugContainer drugContainer) {
   ).then(
     (value) async {
       if (value == true) {
-        if (_data == null) {
+        if (_data == null || _data == "") {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Category name is neccessary!'),

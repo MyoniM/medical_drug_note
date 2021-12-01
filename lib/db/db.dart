@@ -167,6 +167,14 @@ class DrugDb {
     return result.map((e) => Drug.fromJson(e)).toList();
   }
 
+  Future<List<Drug>> readAllDrugs() async {
+    final db = await instance.database;
+    const orderBy = '${DrugFields.createdAt} ASC';
+    final result = await db.query(tableName, orderBy: orderBy);
+
+    return result.map((e) => Drug.fromJson(e)).toList();
+  }
+
   Future<int> update(Drug drug) async {
     final db = await instance.database;
     final id = await db.update(

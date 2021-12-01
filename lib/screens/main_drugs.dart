@@ -77,7 +77,7 @@ class _MainDrugsState extends State<MainDrugs> {
                                       ),
                                       child: ListTile(
                                         horizontalTitleGap: -15,
-                                        leading: Text((index + 1).toString()),
+                                        // leading: Text((index + 1).toString()),
                                         title: Text(
                                           data[index].name,
                                           style: const TextStyle(
