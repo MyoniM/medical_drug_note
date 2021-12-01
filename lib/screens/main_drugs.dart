@@ -25,7 +25,7 @@ class _MainDrugsState extends State<MainDrugs> {
     var mq = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("MAIN DRUGS"),
+        title: const Text("DRUG CATEGORIES"),
       ),
       body: SafeArea(
         child: FutureBuilder<List<DrugContainer>>(
@@ -118,7 +118,7 @@ class _MainDrugsState extends State<MainDrugs> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColor,
-        label: const Text("ADD DRUG CONTAINER"),
+        label: const Text("ADD DRUG CATEGORY"),
         onPressed: () {
           _show(context);
         },

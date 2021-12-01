@@ -90,6 +90,12 @@ class DrugDb {
     return null;
   }
 
+  Future<int> getCategoryCount() async {
+    final db = await instance.database;
+    var x = await db.rawQuery('SELECT COUNT (*) from $drugContainerTableName');
+    return x.first.values.first as int;
+  }
+
   Future<List<DrugContainer>> readAllDrugContainers() async {
     final db = await instance.database;
     const orderBy = '${DrugContainerFields.createdAt} ASC';
@@ -142,6 +148,12 @@ class DrugDb {
   }
 
   // ! read all sub drugs
+  Future<int> getDrugCount() async {
+    final db = await instance.database;
+    var x = await db.rawQuery('SELECT COUNT (*) from $tableName');
+    return x.first.values.first as int;
+  }
+
   Future<List<Drug>> readAll(int categoryId) async {
     final db = await instance.database;
     const orderBy = '${DrugFields.createdAt} ASC';
