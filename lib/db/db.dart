@@ -154,6 +154,7 @@ class DrugDb {
     return x.first.values.first as int;
   }
 
+  // ! read drugs with the same category
   Future<List<Drug>> readAll(int categoryId) async {
     final db = await instance.database;
     const orderBy = '${DrugFields.createdAt} ASC';
@@ -167,10 +168,25 @@ class DrugDb {
     return result.map((e) => Drug.fromJson(e)).toList();
   }
 
+  // ! read all drugs
   Future<List<Drug>> readAllDrugs() async {
     final db = await instance.database;
     const orderBy = '${DrugFields.createdAt} ASC';
     final result = await db.query(tableName, orderBy: orderBy);
+
+    return result.map((e) => Drug.fromJson(e)).toList();
+  }
+
+  // ! read Drugs with same drug name
+  Future<List<Drug>> readAllWithName(String drugName) async {
+    final db = await instance.database;
+    const orderBy = '${DrugFields.createdAt} ASC';
+    final result = await db.query(
+      tableName,
+      where: '${DrugFields.name} = ?',
+      whereArgs: [drugName],
+      orderBy: orderBy,
+    );
 
     return result.map((e) => Drug.fromJson(e)).toList();
   }

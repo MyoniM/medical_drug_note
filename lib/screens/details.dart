@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nest/db/db.dart';
+import 'package:nest/helpers/drug_helper.dart';
 import 'package:nest/models/drug.dart';
 
 class Details extends StatelessWidget {
@@ -140,7 +141,52 @@ class Details extends StatelessWidget {
                               ],
                             ),
                           ],
-                        )
+                        ),
+                        const SizedBox(height: 20),
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                            future: DrugHelper.createAnccestorData(drug),
+                            builder: (_, snapshot) {
+                              if (snapshot.hasData) {
+                                var data = snapshot.data;
+                                return Column(
+                                  children: data!.map((e) {
+                                    return Card(
+                                      elevation: 1,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        width: double.infinity,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              e["categoryName"],
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            ...e["anccesstors"]
+                                                .reversed
+                                                .map((el) {
+                                              return Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                    top: 5,
+                                                    left: 10,
+                                                  ),
+                                                  child: Text("-- ${el.name}"));
+                                            })
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              }
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }),
                       ],
                     ),
                   ],
