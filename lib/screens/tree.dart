@@ -26,8 +26,8 @@ class _TreeState extends State<Tree> {
   String? _selectedNode;
 
   // ! theme
-  final ExpanderPosition _expanderPosition = ExpanderPosition.start;
-  final ExpanderType _expanderType = ExpanderType.caret;
+  final ExpanderPosition _expanderPosition = ExpanderPosition.end;
+  final ExpanderType _expanderType = ExpanderType.plusMinus;
   final ExpanderModifier _expanderModifier = ExpanderModifier.none;
 
   @override
@@ -50,13 +50,10 @@ class _TreeState extends State<Tree> {
       _treeViewController =
           _treeViewController!.loadJSON(json: jsonEncode(nestJsonList));
     });
-    print(
-        "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[FAKKKKK???????????????????????????????]");
   }
 
   @override
   Widget build(BuildContext context) {
-    var mq = MediaQuery.of(context).size;
     // ! theme
     TreeViewTheme _treeViewTheme = TreeViewTheme(
       expanderTheme: ExpanderThemeData(
@@ -64,17 +61,17 @@ class _TreeState extends State<Tree> {
         modifier: _expanderModifier,
         position: _expanderPosition,
         size: 20,
-        color: Colors.blue,
+        color: Colors.grey.shade700,
       ),
       labelStyle: const TextStyle(
         fontSize: 16,
         letterSpacing: 0.3,
       ),
-      parentLabelStyle: TextStyle(
+      parentLabelStyle: const TextStyle(
         fontSize: 16,
         letterSpacing: 0.1,
         fontWeight: FontWeight.w800,
-        color: Colors.blue.shade700,
+        color: Colors.black,
       ),
       iconTheme: IconThemeData(
         size: 18,
@@ -84,8 +81,6 @@ class _TreeState extends State<Tree> {
     );
     // ! theme
 
-    print(
-        "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[FAKKKKK]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]");
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.drugContainer.name),
@@ -113,7 +108,7 @@ class _TreeState extends State<Tree> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(10),
         child: TreeView(
           controller: _treeViewController!,
           // ! slows response. expects  double tap
@@ -127,20 +122,9 @@ class _TreeState extends State<Tree> {
               _getDrugsFromDbAndRePopulateNodes,
             );
           },
-          // onNodeTap: (key) {
-          //   debugPrint(key);
-          //   setState(() {
-          //     _selectedNode = key;
-          //     _treeViewController =
-          //         _treeViewController!.copyWith(selectedKey: key);
-          //   });
-          // },
           theme: _treeViewTheme,
         ),
       ),
-
-      // return const Center(child: CircularProgressIndicator());
-
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColor,
         label: const Text("ADD ROOT DRUG"),
@@ -181,7 +165,7 @@ void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
   var _data = "";
   showDialog(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (dialogCtx) => AlertDialog(
       title: const Text('Enter drug name'),
       content: TextFormField(
         onChanged: (val) {
@@ -191,7 +175,7 @@ void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(false);
+            Navigator.of(dialogCtx).pop(false);
           },
           child: const Text('CANCEL'),
         ),
@@ -199,7 +183,7 @@ void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
           style:
               ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            Navigator.of(dialogCtx).pop(true);
           },
           child: const Text('ADD'),
         ),
@@ -240,14 +224,14 @@ void _showDetails(
   var _data = "";
   showDialog(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (dialogCtx) => AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('Enter drug name'),
           IconButton(
             onPressed: () {
-              Navigator.of(context)
+              Navigator.of(dialogCtx)
                   .popAndPushNamed(Details.routeName, arguments: parentId)
                   .then((value) {
                 if (value == true) {
@@ -257,6 +241,10 @@ void _showDetails(
                 } else if (value == false) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Something went wrong.')));
+                } else if (value == "true") {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          'This dug contains data below it. Either delete the whole category or delete drugs without childs.')));
                 } else {
                   _getDrugsFromDbAndRePopulateNodes();
                 }
@@ -264,7 +252,7 @@ void _showDetails(
             },
             icon: const Icon(Icons.read_more_rounded),
             iconSize: 26,
-            color: Colors.blueAccent,
+            color: Colors.grey.shade600,
             padding: const EdgeInsets.all(0),
           )
         ],
@@ -277,7 +265,7 @@ void _showDetails(
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(false);
+            Navigator.of(dialogCtx).pop(false);
           },
           child: const Text('CANCEL'),
         ),
@@ -285,7 +273,7 @@ void _showDetails(
           style:
               ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            Navigator.of(dialogCtx).pop(true);
           },
           child: const Text('ADD'),
         ),
@@ -317,20 +305,20 @@ void _showDetails(
 void _showDelete(context, categoryId) {
   showDialog(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (dialogCtx) => AlertDialog(
       title: const Text('Delete category?'),
       content: const Text("All data below this category will be lost!"),
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(false);
+            Navigator.of(dialogCtx).pop(false);
           },
           child: const Text('CANCEL'),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(primary: Colors.red[600]),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            Navigator.of(dialogCtx).pop(true);
           },
           child: const Text('DELETE'),
         ),

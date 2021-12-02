@@ -144,49 +144,49 @@ class Details extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         FutureBuilder<List<Map<String, dynamic>>>(
-                            future: DrugHelper.createAnccestorData(drug),
-                            builder: (_, snapshot) {
-                              if (snapshot.hasData) {
-                                var data = snapshot.data;
-                                return Column(
-                                  children: data!.map((e) {
-                                    return Card(
-                                      elevation: 1,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(10),
-                                        width: double.infinity,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              e["categoryName"],
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                          future: DrugHelper.createAnccestorData(drug),
+                          builder: (_, snapshot) {
+                            if (snapshot.hasData) {
+                              var data = snapshot.data;
+                              return Column(
+                                children: data!.map((e) {
+                                  return Card(
+                                    elevation: 1,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      width: double.infinity,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            e["categoryName"],
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
                                             ),
-                                            ...e["anccesstors"]
-                                                .reversed
-                                                .map((el) {
-                                              return Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                    top: 5,
-                                                    left: 10,
-                                                  ),
-                                                  child: Text("-- ${el.name}"));
-                                            })
-                                          ],
-                                        ),
+                                          ),
+                                          ...e["anccesstors"]
+                                              .reversed
+                                              .map((el) {
+                                            return Container(
+                                                padding: const EdgeInsets.only(
+                                                  top: 5,
+                                                  left: 10,
+                                                ),
+                                                child: Text("-- ${el.name}"));
+                                          })
+                                        ],
                                       ),
-                                    );
-                                  }).toList(),
-                                );
-                              }
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            }
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
+                        ),
                       ],
                     ),
                   ],
@@ -204,20 +204,20 @@ class Details extends StatelessWidget {
 void _showDelete(context, drugId) {
   showDialog(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (dialogCtx) => AlertDialog(
       title: const Text('Delete drug?'),
-      content: const Text("All data below this drug will be lost!"),
+      content: const Text("Are you sure you want to delete this drug?"),
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(false);
+            Navigator.of(dialogCtx).pop(false);
           },
           child: const Text('CANCEL'),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(primary: Colors.red[600]),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            Navigator.of(dialogCtx).pop(true);
           },
           child: const Text('DELETE'),
         ),
@@ -227,8 +227,10 @@ void _showDelete(context, drugId) {
     (value) async {
       if (value == true) {
         final count = await DrugDb.instance.delete(drugId);
-        if (count > 0) {
+        if (count == 1) {
           Navigator.of(context).pop(true);
+        } else if (count == -100) {
+          Navigator.of(context).pop("true");
         } else {
           Navigator.of(context).pop(false);
         }

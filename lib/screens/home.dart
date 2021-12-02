@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
-                child: Text("About"),
+                child: Text("Settings"),
                 value: 1,
               ),
             ],
@@ -88,7 +88,7 @@ class _HomeState extends State<Home> {
         onQueryChanged: (query) {
           filterSearch(query);
         },
-        builder: (context, transition) {
+        builder: (buildgCtx, transition) {
           return ClipRRect(
             borderRadius: BorderRadius.circular(5),
             child: Material(

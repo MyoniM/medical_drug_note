@@ -118,12 +118,23 @@ class DrugDb {
 
   Future<int> deleteDrugContainer(int id) async {
     final db = await instance.database;
-
-    return await db.delete(
-      drugContainerTableName,
-      where: '${DrugContainerFields.id} = ?',
-      whereArgs: [id],
-    );
+    try {
+      await db.transaction((txn) async {
+        await txn.delete(
+          tableName,
+          where: '${DrugFields.categoryId} = ?',
+          whereArgs: [id],
+        );
+        await txn.delete(
+          drugContainerTableName,
+          where: '${DrugContainerFields.id} = ?',
+          whereArgs: [id],
+        );
+      });
+    } catch (e) {
+      return 0;
+    }
+    return 1;
   }
 
   // ! Drugs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -162,6 +173,22 @@ class DrugDb {
       columns: DrugFields.values,
       where: '${DrugFields.id} = ?',
       whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Drug.fromJson(maps.first);
+    }
+    return null;
+  }
+
+  // ! read drug with paret Id
+  Future<Drug?> readWithParentId(int parentId) async {
+    final db = await instance.database;
+    final maps = await db.query(
+      tableName,
+      columns: DrugFields.values,
+      where: '${DrugFields.parentId} = ?',
+      whereArgs: [parentId],
     );
 
     if (maps.isNotEmpty) {
@@ -227,8 +254,12 @@ class DrugDb {
 
   Future<int> delete(int id) async {
     final db = await instance.database;
-    // ! transaction with cascade delete
-    // ! same for category
+
+    var res = await readWithParentId(id);
+    if (res != null) {
+      return -100;
+    }
+
     return await db.delete(
       tableName,
       where: '${DrugFields.id} = ?',

@@ -25,34 +25,87 @@ class _AboutState extends State<About> {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ElevatedButton(
-                onPressed: () async {
-                  await pickFiles(fileType);
-                },
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 40)),
-                child: const Text("SELECT FILE TO IMPORT"),
+              Container(
+                padding: const EdgeInsets.all(5),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade400, width: .5),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.grey.shade200,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Use this to share data with another user",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await pickFiles(fileType);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green.shade400,
+                        minimumSize: const Size(double.infinity, 40),
+                      ),
+                      child: const Text("SELECT FILE TO IMPORT"),
+                    ),
+                    if (file != null) fileDetails(file!),
+                    if (file != null) importFile(file!),
+                    ElevatedButton(
+                      onPressed: () {
+                        DrugHelper.exportData().then((value) {
+                          if (value == 1) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'medical_drugs.json file exported to downloads folder.')));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Something went wrong. Check app permissions.')));
+                          }
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 40)),
+                      child: const Text("EXPORT DATA"),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: Colors.grey.shade400, width: .5),
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.white,
+                      ),
+                      child: const Text(
+                        "If error persists, deny the app's storage permission and allow it again.",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              if (file != null) fileDetails(file!),
-              if (file != null) importFile(file!),
-              ElevatedButton(
-                onPressed: () {
-                  DrugHelper.exportData().then((value) {
-                    if (value == 1) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text(
-                              'medical_drugs.json file exported to downloads folder.')));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Something went wrong.')));
-                    }
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 40)),
-                child: const Text("EXPORT DATA"),
-              ),
+              const SizedBox(height: 20),
+              const Text("@Disclaimer, Use at Your Own Risk"),
+              const SizedBox(height: 5),
+              const Text(
+                  "The developer, in any way whatsoever, will not be responsible for your use of the app and any problems that may arise when using it. Double check the stored values before using/sharing."),
+              const SizedBox(height: 20),
+              const Text("Meet the developer, Yonatan"),
+              const SizedBox(height: 5),
+              const Text("Telegram: @Y00NII"),
+              const Text("Email: se.yonatan.merkebu@gmail.com"),
             ],
           ),
         ),
@@ -100,8 +153,7 @@ class _AboutState extends State<About> {
         ),
         TextButton(
           style: TextButton.styleFrom(
-            backgroundColor: Colors.grey[200],
-          ),
+              backgroundColor: Colors.grey[300], primary: Colors.red),
           onPressed: () async {
             DrugHelper.importData(file).then((value) {
               if (value == 1) {

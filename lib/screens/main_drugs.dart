@@ -108,7 +108,7 @@ class _MainDrugsState extends State<MainDrugs> {
                                 },
                               ),
                             )
-                          : const Text("No data yet.")
+                          : Container()
                     ],
                   ),
                 );
@@ -131,7 +131,7 @@ void _show(context) {
   var _data = "";
   showDialog(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (dialogCtx) => AlertDialog(
       title: const Text('Add category'),
       content: TextFormField(
         onChanged: (val) {
@@ -141,7 +141,7 @@ void _show(context) {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(false);
+            Navigator.of(dialogCtx).pop(false);
           },
           child: const Text('CANCEL'),
         ),
@@ -149,7 +149,7 @@ void _show(context) {
           style:
               ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            Navigator.of(dialogCtx).pop(true);
           },
           child: const Text('ADD'),
         ),
