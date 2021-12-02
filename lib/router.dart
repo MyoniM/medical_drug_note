@@ -5,6 +5,7 @@ import './screens/home.dart';
 import './screens/main_drugs.dart';
 import './screens/tree.dart';
 import './screens/details.dart';
+import './screens/about.dart';
 
 class AppRouter {
   Route onGenerateRoute(RouteSettings settings) {
@@ -17,17 +18,15 @@ class AppRouter {
 
       case Tree.routeName:
         return MaterialPageRoute(
-          builder: (ctx) => Tree(
-            drugContainer: settings.arguments as DrugContainer,
-          ),
-        );
+            builder: (ctx) =>
+                Tree(drugContainer: settings.arguments as DrugContainer));
 
       case Details.routeName:
         return MaterialPageRoute(
-          builder: (ctx) => Details(
-            drugId: settings.arguments as int,
-          ),
-        );
+            builder: (ctx) => Details(drugId: settings.arguments as int));
+
+      case About.routeName:
+        return MaterialPageRoute(builder: (ctx) => const About());
 
       default:
         return MaterialPageRoute(builder: (ctx) => const Home());

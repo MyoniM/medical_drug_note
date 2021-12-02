@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:nest/db/db.dart';
 import 'package:nest/models/drug.dart';
+import 'package:nest/models/drug_container.dart';
 import 'package:nest/models/nest.dart';
 
 class DrugHelper {
@@ -54,6 +59,57 @@ class DrugHelper {
 
     return container;
   }
+
+  static Future<int> exportData() async {
+    String fileName = "medical_drugs.json";
+    File jsonFile = File("/storage/emulated/0/Download/" + fileName);
+    bool fileExists = jsonFile.existsSync();
+
+    Map<String, dynamic> fileContent = {};
+    var listOfAllDrugs = await DrugDb.instance.readAllDrugs();
+    var listOfAllCategories = await DrugDb.instance.readAllDrugContainers();
+
+    fileContent["drugs"] = listOfAllDrugs.map((e) => e.toMap()).toList();
+    fileContent["categories"] =
+        listOfAllCategories.map((e) => e.toMap()).toList();
+
+    try {
+      if (fileExists) {
+        writeToFile(fileContent, jsonFile);
+      } else {
+        jsonFile.createSync();
+        fileExists = true;
+        writeToFile(fileContent, jsonFile);
+      }
+    } catch (e) {
+      return 0;
+    }
+    return 1;
+  }
+
+  static Future<int> importData(PlatformFile file) async {
+    File _file = File(file.path!);
+    try {
+      Map<String, dynamic> jsonFileContent =
+          json.decode(_file.readAsStringSync());
+
+      List<dynamic> jsonDrugList = jsonFileContent["drugs"];
+      List<dynamic> jsonDrugContainers = jsonFileContent["categories"];
+
+      List<Drug> ld = jsonDrugList.map((e) => Drug.fromJson(e)).toList();
+      List<DrugContainer> lc =
+          jsonDrugContainers.map((e) => DrugContainer.fromJson(e)).toList();
+
+      await DrugDb.instance.createBulk(ld, lc);
+    } catch (e) {
+      return 0;
+    }
+    return 1;
+  }
+}
+
+void writeToFile(Map<String, dynamic> content, File file) {
+  file.writeAsStringSync(json.encode(content), flush: true);
 }
 
 recurlyNest(List<Nest> list, List<Drug> listOfDrugs) {
@@ -94,3 +150,4 @@ List<Drug> recurlyNestAnccesstor(
 //      {_id: 2, name: rursursurs, description: , parentId: 1, categoryId: 2, createdAt: 2021-11-29T11:46:02.305826},
 //       {_id: 1, name: fjkghd, description: , parentId: 0, categoryId: 2, createdAt: 2021-11-29T11:44:56.599057},
 //       ];
+

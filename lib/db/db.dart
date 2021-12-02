@@ -23,20 +23,20 @@ class DrugDb {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 1,
       onCreate: _createDb,
-      onUpgrade: _onUpgrade,
+      // onUpgrade: _onUpgrade,
     );
   }
 
-  // UPGRADE DATABASE TABLES
-  void _onUpgrade(Database db, int oldVersion, int newVersion) {
-    if (oldVersion < newVersion) {
-      // db.execute("ALTER TABLE $tableName ALTER COLUMN $cre TEXT;");
-      db.execute(
-          "ALTER TABLE $tableName ADD COLUMN ${DrugFields.categoryId} INTEGER NOT NULL DEFAULT 0;");
-    }
-  }
+  // // UPGRADE DATABASE TABLES
+  // void _onUpgrade(Database db, int oldVersion, int newVersion) {
+  //   if (oldVersion < newVersion) {
+  //     // db.execute("ALTER TABLE $tableName ALTER COLUMN $cre TEXT;");
+  //     db.execute(
+  //         "ALTER TABLE $tableName ADD COLUMN ${DrugFields.categoryId} INTEGER NOT NULL DEFAULT 0;");
+  //   }
+  // }
 
   Future _createDb(Database db, int version) async {
     const idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
@@ -50,6 +50,7 @@ class DrugDb {
       ${DrugFields.name} $nameType,
       ${DrugFields.description} $descriptionType,
       ${DrugFields.parentId} $parentIdType,
+      ${DrugFields.categoryId} $parentIdType,
       ${DrugFields.createdAt} $parentIdType
     )
     ''');
@@ -130,6 +131,28 @@ class DrugDb {
     final db = await instance.database;
     final id = db.insert(tableName, drug.toMap());
     return id;
+  }
+
+  // ! Bulk insert with transaction
+  Future<int> createBulk(
+      List<Drug> drugs, List<DrugContainer> containers) async {
+    final db = await instance.database;
+    try {
+      await db.transaction((txn) async {
+        await txn.rawQuery('DELETE from $tableName');
+        await txn.rawQuery('DELETE from $drugContainerTableName');
+
+        for (var drug in drugs) {
+          await txn.insert(tableName, drug.toMap());
+        }
+        for (var container in containers) {
+          await txn.insert(drugContainerTableName, container.toMap());
+        }
+      });
+    } catch (e) {
+      return 0;
+    }
+    return 1;
   }
 
   Future<Drug?> read(int id) async {

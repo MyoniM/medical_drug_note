@@ -39,6 +39,7 @@ dependencies:
   flutter_treeview: ^1.0.6+1
   material_floating_search_bar: ^0.3.6
   shared_preferences: ^2.0.9
+  file_picker: ^4.2.7
 
 dev_dependencies:
   flutter_test:

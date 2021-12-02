@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:nest/db/db.dart';
 import 'package:nest/models/drug.dart';
+import 'package:nest/screens/about.dart';
 import 'package:nest/screens/details.dart';
 
 class Home extends StatefulWidget {
@@ -59,7 +60,11 @@ class _HomeState extends State<Home> {
         actions: [
           PopupMenuButton(
             onSelected: (val) {
-              if (val == 1) {}
+              if (val == 1) {
+                Navigator.of(context).pushNamed(About.routeName).then((value) {
+                  getDrugs();
+                });
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(

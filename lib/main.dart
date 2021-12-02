@@ -39,3 +39,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+// !!!!!!!!!
+// ! Looking up a deactivated widget's ancestor is unsafe.
+// ! delete cascade
+// ! node arrow to right
+// ! share !!!!!!!!!!!!!
+// !!!
+// ! color
