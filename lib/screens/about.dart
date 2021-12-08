@@ -19,7 +19,7 @@ class _AboutState extends State<About> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("About App"),
+        title: const Text("Settings"),
       ),
       body: SingleChildScrollView(
         child: Padding(

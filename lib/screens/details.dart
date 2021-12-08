@@ -11,6 +11,13 @@ class Details extends StatelessWidget {
   Drug? d;
   String? _drugName;
   String? _drugDescription;
+  int? _cllr;
+
+  var _data = "";
+
+  setX(y) {
+    _cllr = y;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +37,7 @@ class Details extends StatelessWidget {
                   parentId: d!.parentId,
                   categoryId: d!.categoryId,
                   createdAt: d!.createdAt,
+                  clr: _cllr ?? d!.clr,
                 ),
               );
 
@@ -108,6 +116,8 @@ class Details extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    ColorPicker(drug.clr, setX),
+                    const SizedBox(height: 20),
                     Column(
                       children: [
                         Row(
@@ -115,7 +125,7 @@ class Details extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Text("Category: "),
+                                const Text("Category id: "),
                                 Text(drug.categoryId.toString())
                               ],
                             ),
@@ -237,4 +247,84 @@ void _showDelete(context, drugId) {
       }
     },
   );
+}
+
+class ColorPicker extends StatefulWidget {
+  const ColorPicker(
+    this.clr,
+    this.onC, {
+    Key? key,
+  }) : super(key: key);
+
+  final int clr;
+  final Function onC;
+  @override
+  State<ColorPicker> createState() => _ColorPickerState();
+}
+
+class _ColorPickerState extends State<ColorPicker> {
+  int? _value;
+  onChange(value) {
+    widget.onC(value);
+    setState(() {
+      _value = value;
+    });
+  }
+
+  @override
+  void initState() {
+    _value = widget.clr;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        clr(Colors.black, Colors.black.value, _value!, onChange),
+        clr(Colors.orange, Colors.orange.value, _value!, onChange),
+        clr(Colors.green, Colors.green.value, _value!, onChange),
+        clr(Colors.blue, Colors.blue.value, _value!, onChange),
+        clr(Colors.red, Colors.red.value, _value!, onChange),
+      ],
+    );
+  }
+}
+
+class clr extends StatefulWidget {
+  clr(this.color, this.value, this.groupValue, this.onChanged, {Key? key});
+  final Color color;
+  final int value;
+  final int groupValue;
+  final Function onChanged;
+
+  @override
+  State<clr> createState() => _clrState();
+}
+
+class _clrState extends State<clr> {
+  @override
+  Widget build(BuildContext context) {
+    bool _selected = widget.value == widget.groupValue;
+    return InkWell(
+      onTap: () => widget.onChanged(widget.value),
+      child: Container(
+        width: MediaQuery.of(context).size.width * .17,
+        height: 30,
+        child: _selected
+            ? const Center(
+                child: Icon(
+                  Icons.check,
+                  color: Colors.white,
+                ),
+              )
+            : null,
+        decoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    );
+  }
 }

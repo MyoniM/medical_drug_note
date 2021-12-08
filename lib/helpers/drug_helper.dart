@@ -20,7 +20,7 @@ class DrugHelper {
         .map((e) => TreeNode(
               id: e.id!.toString(),
               label: e.name,
-              data: Colors.green,
+              data: e.clr,
             ))
         .toList();
     // ! insert to nest
@@ -120,7 +120,7 @@ recurlyNest(List<TreeNode> list, List<Drug> listOfDrugs) {
           .map((e) => TreeNode(
                 id: e.id!.toString(),
                 label: e.name,
-                data: Colors.red,
+                data: e.clr,
               ))
           .toList(),
     );

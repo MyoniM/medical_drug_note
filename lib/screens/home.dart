@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: FloatingSearchBar(
-        hint: 'Search a drug...',
+        hint: 'Search a class...',
         elevation: 2.0,
         margins: const EdgeInsets.all(10),
         // backdropColor: Colors.transparent,
@@ -132,7 +132,7 @@ class _HomeState extends State<Home> {
                       return Row(
                         children: [
                           Expanded(child: Stat(mq, "Categories", data[1])),
-                          Expanded(child: Stat(mq, "Nodes", data[0])),
+                          Expanded(child: Stat(mq, "Classes", data[0])),
                         ],
                       );
                     }

@@ -46,6 +46,12 @@ class _TreeState extends State<Tree> {
               if (val == 1) {
                 _showDelete(context, widget.drugContainer.id);
               }
+              if (val == 2) {
+                treeController!.collapseAll();
+              }
+              if (val == 3) {
+                treeController!.expandAll();
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -55,6 +61,14 @@ class _TreeState extends State<Tree> {
               const PopupMenuItem(
                 child: Text("Delete"),
                 value: 1,
+              ),
+              const PopupMenuItem(
+                child: Text("Collapse all"),
+                value: 2,
+              ),
+              const PopupMenuItem(
+                child: Text("Expand all"),
+                value: 3,
               ),
             ],
           ),
@@ -69,8 +83,6 @@ class _TreeState extends State<Tree> {
                 child: TreeView(
                   controller: treeController!,
                   theme: const TreeViewTheme(),
-                  // scrollController: appController.scrollController,
-                  // nodeHeight: appController.nodeHeight,
                   nodeBuilder: (_, node) => InkWell(
                     onTap: () => _describeAncestors(node),
                     onDoubleTap: () {
@@ -88,7 +100,7 @@ class _TreeState extends State<Tree> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColor,
-        label: const Text("ADD ROOT DRUG"),
+        label: const Text("ADD ROOT CLASS"),
         onPressed: () {
           _showAdd(context, widget.drugContainer.id!, init);
         },
@@ -102,7 +114,7 @@ class _TreeState extends State<Tree> {
 
     showSnackBar(
       context,
-      'Parent of "${node.label}"$ancestors',
+      'Parent of "${node.label}": $ancestors',
       duration: const Duration(seconds: 5),
     );
   }
@@ -130,14 +142,25 @@ Future<void> generateSampleTree(TreeNode parent, int id) async {
 
 void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
   var _data = "";
+  int x = Colors.black.value;
+  setX(y) {
+    x = y;
+  }
+
   showDialog(
     context: context,
     builder: (dialogCtx) => AlertDialog(
-      title: const Text('Enter drug name'),
-      content: TextFormField(
-        onChanged: (val) {
-          _data = val;
-        },
+      title: const Text('Enter class name'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ColorPicker(x, setX),
+          TextFormField(
+            onChanged: (val) {
+              _data = val;
+            },
+          ),
+        ],
       ),
       actions: [
         TextButton(
@@ -162,7 +185,7 @@ void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
         if (_data == "" || _data.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Drug name is neccessary!'),
+              content: Text('Class name is neccessary!'),
             ),
           );
         } else {
@@ -173,6 +196,7 @@ void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
               categoryId: categoryId,
               parentId: 0,
               createdAt: DateTime.now().toIso8601String(),
+              clr: x,
             ),
           );
           _getDrugsFromDbAndRePopulateNodes();
@@ -189,13 +213,18 @@ void _showDetails(
   _getDrugsFromDbAndRePopulateNodes,
 ) {
   var _data = "";
+  int x = Colors.black.value;
+  setX(y) {
+    x = y;
+  }
+
   showDialog(
     context: context,
     builder: (dialogCtx) => AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('Enter drug name'),
+          const Text('Enter class name'),
           IconButton(
             onPressed: () {
               Navigator.of(dialogCtx)
@@ -204,14 +233,14 @@ void _showDetails(
                 if (value == true) {
                   _getDrugsFromDbAndRePopulateNodes();
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Drug deleted successfully.')));
+                      content: Text('Class deleted successfully.')));
                 } else if (value == false) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Something went wrong.')));
                 } else if (value == "true") {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text(
-                          'This dug contains data below it. Either delete the whole category or delete drugs without childs.')));
+                          'This class contains data below it. Either delete the whole category or delete classes without childs.')));
                 } else {
                   _getDrugsFromDbAndRePopulateNodes();
                 }
@@ -224,10 +253,16 @@ void _showDetails(
           )
         ],
       ),
-      content: TextFormField(
-        onChanged: (val) {
-          _data = val;
-        },
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ColorPicker(x, setX),
+          TextFormField(
+            onChanged: (val) {
+              _data = val;
+            },
+          ),
+        ],
       ),
       actions: [
         TextButton(
@@ -251,7 +286,7 @@ void _showDetails(
       if (value == true) {
         if (_data == "" || _data.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Drug name is neccessary!')));
+              const SnackBar(content: Text('Class name is neccessary!')));
         } else {
           DrugDb.instance.create(
             Drug(
@@ -260,6 +295,7 @@ void _showDetails(
               categoryId: categoryId,
               parentId: parentId,
               createdAt: DateTime.now().toIso8601String(),
+              clr: x,
             ),
           );
           _getDrugsFromDbAndRePopulateNodes();
@@ -358,4 +394,78 @@ void _showUpdate(context, DrugContainer drugContainer) {
       }
     },
   );
+}
+
+class ColorPicker extends StatefulWidget {
+  const ColorPicker(
+    this.clr,
+    this.onC, {
+    Key? key,
+  }) : super(key: key);
+
+  final int clr;
+  final Function onC;
+  @override
+  State<ColorPicker> createState() => _ColorPickerState();
+}
+
+class _ColorPickerState extends State<ColorPicker> {
+  var _value = Colors.black.value;
+  onChange(value) {
+    widget.onC(value);
+    setState(() {
+      _value = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        clr(Colors.black, Colors.black.value, _value, onChange),
+        clr(Colors.orange, Colors.orange.value, _value, onChange),
+        clr(Colors.green, Colors.green.value, _value, onChange),
+        clr(Colors.blue, Colors.blue.value, _value, onChange),
+        clr(Colors.red, Colors.red.value, _value, onChange),
+      ],
+    );
+  }
+}
+
+class clr extends StatefulWidget {
+  clr(this.color, this.value, this.groupValue, this.onChanged, {Key? key});
+  final Color color;
+  final int value;
+  final int groupValue;
+  final Function onChanged;
+
+  @override
+  State<clr> createState() => _clrState();
+}
+
+class _clrState extends State<clr> {
+  @override
+  Widget build(BuildContext context) {
+    bool _selected = widget.value == widget.groupValue;
+    return InkWell(
+      onTap: () => widget.onChanged(widget.value),
+      child: Container(
+        width: MediaQuery.of(context).size.width * .112,
+        height: 30,
+        child: _selected
+            ? const Center(
+                child: Icon(
+                  Icons.check,
+                  color: Colors.white,
+                ),
+              )
+            : null,
+        decoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    );
+  }
 }

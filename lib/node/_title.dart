@@ -9,7 +9,7 @@ class _NodeTitle extends StatelessWidget {
 
     return Text(
       nodeScope.node.label,
-      style: TextStyle(fontSize: 16, color: nodeScope.node.data as Color),
+      style: TextStyle(fontSize: 16, color: Color(nodeScope.node.data as int)),
       overflow: TextOverflow.ellipsis,
     );
   }

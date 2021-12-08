@@ -41,17 +41,17 @@ class DrugDb {
   Future _createDb(Database db, int version) async {
     const idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
     const nameType = "TEXT NOT NULL";
-    const descriptionType = "TEXT NOT NULL";
     const parentIdType = "INTEGER NOT NULL";
 
     await db.execute('''
     CREATE TABLE $tableName (
       ${DrugFields.id} $idType,
       ${DrugFields.name} $nameType,
-      ${DrugFields.description} $descriptionType,
+      ${DrugFields.description} $nameType,
       ${DrugFields.parentId} $parentIdType,
       ${DrugFields.categoryId} $parentIdType,
-      ${DrugFields.createdAt} $parentIdType
+      ${DrugFields.createdAt} $parentIdType,
+      ${DrugFields.clr} $parentIdType
     )
     ''');
 
