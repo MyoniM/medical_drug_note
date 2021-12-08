@@ -3,13 +3,13 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:nest/db/db.dart';
 import 'package:nest/models/drug.dart';
 import 'package:nest/models/drug_container.dart';
-import 'package:nest/models/nest.dart';
 
 class DrugHelper {
-  static List<Nest> createNestedData(List<Drug> listOfDrugs) {
+  static List<TreeNode> createNestedData(List<Drug> listOfDrugs) {
     if (listOfDrugs.isEmpty) return [];
 
     // ! get the nodes
@@ -17,12 +17,10 @@ class DrugHelper {
         listOfDrugs.where((element) => element.parentId == 0).toList();
     // ! conver to Nest
     final rootNestList = rootItems
-        .map((e) => Nest(
-              key: e.id!,
+        .map((e) => TreeNode(
+              id: e.id!.toString(),
               label: e.name,
-              icon: Icons.ac_unit,
-              expanded: true,
-              children: [],
+              data: Colors.green,
             ))
         .toList();
     // ! insert to nest
@@ -112,23 +110,22 @@ void writeToFile(Map<String, dynamic> content, File file) {
   file.writeAsStringSync(json.encode(content), flush: true);
 }
 
-recurlyNest(List<Nest> list, List<Drug> listOfDrugs) {
+recurlyNest(List<TreeNode> list, List<Drug> listOfDrugs) {
   if (list.isEmpty) return;
   for (var nest in list) {
-    nest.children.addAll(
+    nest.addChildren(
       listOfDrugs
-          .where((element) => element.parentId == nest.key)
+          .where((element) => element.parentId == int.parse(nest.id))
           .toList()
-          .map((e) => Nest(
-                key: e.id!,
+          .map((e) => TreeNode(
+                id: e.id!.toString(),
                 label: e.name,
-                icon: Icons.ac_unit,
-                expanded: true,
-                children: [],
+                data: Colors.red,
               ))
           .toList(),
     );
-    recurlyNest(nest.children, listOfDrugs);
+
+    recurlyNest(nest.children.toList(), listOfDrugs);
   }
 }
 
@@ -142,12 +139,3 @@ List<Drug> recurlyNestAnccesstor(
   }
   return anccesstors;
 }
-
-// var x = [
-//   {_id: 35, name: Non-Selective, description: , parentId: 13, categoryId: 3, createdAt: 2021-12-01T09:44:57.495281},
-//    {_id: 13, name: Agonists, description: no clues, parentId: 0, categoryId: 3, createdAt: 2021-11-30T22:58:14.728323},
-//     {_id: 5, name: xyxtidtd, description: , parentId: 2, categoryId: 2, createdAt: 2021-11-29T11:46:30.000999},
-//      {_id: 2, name: rursursurs, description: , parentId: 1, categoryId: 2, createdAt: 2021-11-29T11:46:02.305826},
-//       {_id: 1, name: fjkghd, description: , parentId: 0, categoryId: 2, createdAt: 2021-11-29T11:44:56.599057},
-//       ];
-

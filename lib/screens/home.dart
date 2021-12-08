@@ -132,7 +132,7 @@ class _HomeState extends State<Home> {
                       return Row(
                         children: [
                           Expanded(child: Stat(mq, "Categories", data[1])),
-                          Expanded(child: Stat(mq, "Drugs", data[0])),
+                          Expanded(child: Stat(mq, "Nodes", data[0])),
                         ],
                       );
                     }

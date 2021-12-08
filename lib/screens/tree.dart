@@ -1,14 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_treeview/flutter_treeview.dart';
+import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 
 import 'package:nest/db/db.dart';
 import 'package:nest/models/drug.dart';
 import 'package:nest/models/drug_container.dart';
+import 'package:nest/node/tree_node_tile.dart';
 import 'package:nest/screens/details.dart';
 
 import '../helpers/drug_helper.dart';
+import '../common/common.dart';
 
 class Tree extends StatefulWidget {
   final DrugContainer drugContainer;
@@ -20,70 +20,23 @@ class Tree extends StatefulWidget {
 }
 
 class _TreeState extends State<Tree> {
-  TreeViewController? _treeViewController;
-  List<Node>? _nodes;
-  bool docsOpen = true;
-  String? _selectedNode;
-
-  // ! theme
-  final ExpanderPosition _expanderPosition = ExpanderPosition.end;
-  final ExpanderType _expanderType = ExpanderType.plusMinus;
-  final ExpanderModifier _expanderModifier = ExpanderModifier.none;
+  bool _done = false;
+  TreeViewController? treeController;
 
   @override
   void initState() {
-    _nodes = [const Node(key: "1", label: "Loading data")];
-    _treeViewController = TreeViewController(
-      children: _nodes!,
-      selectedKey: _selectedNode,
-    );
-    _getDrugsFromDbAndRePopulateNodes();
+    Future.delayed(Duration.zero, () async => await init());
     super.initState();
-  }
-
-  _getDrugsFromDbAndRePopulateNodes() async {
-    final drugList = await DrugDb.instance.readAll(widget.drugContainer.id!);
-    final nestList = DrugHelper.createNestedData(drugList);
-    final nestJsonList = nestList.map((e) => e.toMap()).toList();
-
-    setState(() {
-      _treeViewController =
-          _treeViewController!.loadJSON(json: jsonEncode(nestJsonList));
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // ! theme
-    TreeViewTheme _treeViewTheme = TreeViewTheme(
-      expanderTheme: ExpanderThemeData(
-        type: _expanderType,
-        modifier: _expanderModifier,
-        position: _expanderPosition,
-        size: 20,
-        color: Colors.grey.shade700,
-      ),
-      labelStyle: const TextStyle(
-        fontSize: 16,
-        letterSpacing: 0.3,
-      ),
-      parentLabelStyle: const TextStyle(
-        fontSize: 16,
-        letterSpacing: 0.1,
-        fontWeight: FontWeight.w800,
-        color: Colors.black,
-      ),
-      iconTheme: IconThemeData(
-        size: 18,
-        color: Colors.grey.shade800,
-      ),
-      colorScheme: Theme.of(context).colorScheme,
-    );
-    // ! theme
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.drugContainer.name),
+        title: Text(
+          widget.drugContainer.name,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           PopupMenuButton(
             onSelected: (val) {
@@ -109,56 +62,70 @@ class _TreeState extends State<Tree> {
       ),
       body: Container(
         padding: const EdgeInsets.all(10),
-        child: TreeView(
-          controller: _treeViewController!,
-          // ! slows response. expects  double tap
-          supportParentDoubleTap: true,
-          onExpansionChanged: (key, expanded) => _expandNode(key, expanded),
-          onNodeDoubleTap: (key) {
-            _showDetails(
-              context,
-              widget.drugContainer.id!,
-              int.parse(key),
-              _getDrugsFromDbAndRePopulateNodes,
-            );
-          },
-          theme: _treeViewTheme,
-        ),
+        child: !_done
+            ? const Center(child: CircularProgressIndicator())
+            : Scrollbar(
+                isAlwaysShown: false,
+                child: TreeView(
+                  controller: treeController!,
+                  theme: const TreeViewTheme(),
+                  // scrollController: appController.scrollController,
+                  // nodeHeight: appController.nodeHeight,
+                  nodeBuilder: (_, node) => InkWell(
+                    onTap: () => _describeAncestors(node),
+                    onDoubleTap: () {
+                      _showDetails(
+                        context,
+                        widget.drugContainer.id!,
+                        int.parse(node.id),
+                        init,
+                      );
+                    },
+                    child: const TreeNodeTile(),
+                  ),
+                ),
+              ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColor,
         label: const Text("ADD ROOT DRUG"),
         onPressed: () {
-          _showAdd(context, widget.drugContainer.id!,
-              _getDrugsFromDbAndRePopulateNodes);
+          _showAdd(context, widget.drugContainer.id!, init);
         },
       ),
     );
   }
 
-  _expandNode(String key, bool expanded) {
-    String msg = '${expanded ? "Expanded" : "Collapsed"}: $key';
-    debugPrint(msg);
-    Node node = _treeViewController!.getNode(key)!;
-    if (node != null) {
-      List<Node> updated;
-      if (key == 'docs') {
-        updated = _treeViewController!.updateNode(
-            key,
-            node.copyWith(
-              expanded: expanded,
-              icon: expanded ? Icons.folder_open : Icons.folder,
-            ));
-      } else {
-        updated = _treeViewController!
-            .updateNode(key, node.copyWith(expanded: expanded));
-      }
-      setState(() {
-        if (key == 'docs') docsOpen = expanded;
-        _treeViewController = _treeViewController!.copyWith(children: updated);
-      });
-    }
+  void _describeAncestors(TreeNode node) {
+    final ancestors =
+        node.ancestors.map((ancestor) => ancestor.label).join('/ ');
+
+    showSnackBar(
+      context,
+      'Parent of "${node.label}"$ancestors',
+      duration: const Duration(seconds: 5),
+    );
   }
+
+  Future<void> init() async {
+    print("calling init....................");
+    final rootNode = TreeNode(id: widget.drugContainer.id!.toString());
+    await generateSampleTree(rootNode, widget.drugContainer.id!);
+    setState(() {
+      treeController = TreeViewController(
+        rootNode: rootNode,
+      );
+      _done = true;
+    });
+    treeController!.refreshNode(rootNode);
+  }
+}
+
+Future<void> generateSampleTree(TreeNode parent, int id) async {
+  final drugList = await DrugDb.instance.readAll(id);
+  final nestList = DrugHelper.createNestedData(drugList);
+
+  parent.addChildren(nestList);
 }
 
 void _showAdd(context, categoryId, _getDrugsFromDbAndRePopulateNodes) {
