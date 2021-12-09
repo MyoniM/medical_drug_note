@@ -75,14 +75,14 @@ class _TreeState extends State<Tree> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         child: !_done
             ? const Center(child: CircularProgressIndicator())
             : Scrollbar(
                 isAlwaysShown: false,
                 child: TreeView(
                   controller: treeController!,
-                  theme: const TreeViewTheme(),
+                  theme: const TreeViewTheme(lineThickness: .5, indent: 15),
                   nodeBuilder: (_, node) => InkWell(
                     onTap: () => _describeAncestors(node),
                     onDoubleTap: () {
@@ -130,6 +130,7 @@ class _TreeState extends State<Tree> {
       _done = true;
     });
     treeController!.refreshNode(rootNode);
+    treeController!.expandAll();
   }
 }
 

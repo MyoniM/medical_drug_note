@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 const String tableName = "drugs";
 
 class DrugFields {
@@ -47,7 +45,7 @@ class Drug {
         parentId = json[DrugFields.parentId] as int,
         categoryId = json[DrugFields.categoryId] as int,
         createdAt = json[DrugFields.createdAt] as String,
-        clr = json[DrugFields.clr] ?? Colors.black.value;
+        clr = json[DrugFields.clr] as int;
 
   toMap() {
     return {

@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Nest',
       theme: ThemeData().copyWith(
         primaryColor: const Color(0xFF011240),
         hoverColor: Colors.red.shade100,
