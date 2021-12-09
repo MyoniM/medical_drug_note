@@ -65,7 +65,7 @@ class _AboutState extends State<About> {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text(
-                                        'medical_drugs.json file exported to downloads folder.')));
+                                        'nested_data.json file exported to downloads folder.')));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -159,7 +159,7 @@ class _AboutState extends State<About> {
               if (value == 1) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text(
-                        'Successfully imported data from medical_drugs.json.')));
+                        'Successfully imported data from nested_data.json.')));
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Something went wrong.')));

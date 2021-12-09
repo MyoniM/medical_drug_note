@@ -28,10 +28,10 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData().copyWith(
-        primaryColor: Colors.grey.shade800,
+        primaryColor: const Color(0xFF011240),
         hoverColor: Colors.red.shade100,
         colorScheme:
-            ThemeData().colorScheme.copyWith(primary: Colors.grey.shade800),
+            ThemeData().colorScheme.copyWith(primary: const Color(0xFF011240)),
       ),
       debugShowCheckedModeBanner: false,
       home: const Home(),
@@ -39,8 +39,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// !!!!!!!!!
-// ! node arrow to right
-// !!!
-// ! color

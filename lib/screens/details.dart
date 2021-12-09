@@ -23,7 +23,7 @@ class Details extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Drug details"),
+        title: const Text("Class details"),
         actions: [
           IconButton(
             onPressed: () async {
@@ -43,7 +43,7 @@ class Details extends StatelessWidget {
 
               if (count > 0) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Drug updated successfully.')));
+                    content: Text('Class updated successfully.')));
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Something went wrong.')));
@@ -215,8 +215,8 @@ void _showDelete(context, drugId) {
   showDialog(
     context: context,
     builder: (dialogCtx) => AlertDialog(
-      title: const Text('Delete drug?'),
-      content: const Text("Are you sure you want to delete this drug?"),
+      title: const Text('Delete class?'),
+      content: const Text("Are you sure you want to delete this class?"),
       actions: [
         TextButton(
           onPressed: () {

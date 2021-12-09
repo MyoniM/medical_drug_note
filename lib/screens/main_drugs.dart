@@ -25,7 +25,7 @@ class _MainDrugsState extends State<MainDrugs> {
     var mq = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("DRUG CATEGORIES"),
+        title: const Text("CLASS CATEGORIES"),
       ),
       body: SafeArea(
         child: FutureBuilder<List<DrugContainer>>(
@@ -118,7 +118,7 @@ class _MainDrugsState extends State<MainDrugs> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColor,
-        label: const Text("ADD DRUG CATEGORY"),
+        label: const Text("ADD CLASS CATEGORY"),
         onPressed: () {
           _show(context);
         },
@@ -157,7 +157,7 @@ void _show(context) {
     ),
   ).then(
     (value) => {
-      if (value)
+      if (value == true)
         {
           if (_data == "" || _data.isEmpty)
             ScaffoldMessenger.of(context).showSnackBar(

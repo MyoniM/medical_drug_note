@@ -59,7 +59,7 @@ class DrugHelper {
   }
 
   static Future<int> exportData() async {
-    String fileName = "medical_drugs.json";
+    String fileName = "nested_data.json";
     File jsonFile = File("/storage/emulated/0/Download/" + fileName);
     bool fileExists = jsonFile.existsSync();
 
